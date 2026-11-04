@@ -201,7 +201,7 @@ footer p{margin:0;font-size:14px;color:#CFC5C3}
     </div>
     <div class="where">
       <span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/></svg>Sarzedo e região · R. José Luiz Rezende, 195</span>
-      <span id="status">Ter. a dom., 9h às 21h</span>
+      <span id="status">Ter. a dom., a partir das 10h</span>
       <span>Delivery de quarta a domingo</span>
     </div>
   </div>
@@ -274,7 +274,7 @@ footer p{margin:0;font-size:14px;color:#CFC5C3}
   <div class="wrap gut foot-in">
     <div><h3>Cevamalt</h3><p>Distribuidora de bebidas em Sarzedo, MG.<br>Instagram: @cevamalt</p></div>
     <div><h3>Onde estamos</h3><p>R. José Luiz Rezende, 195<br>Santa Rosa de Lima, Sarzedo - MG<br>CEP 32450-000<br><a href="https://www.google.com/maps/search/?api=1&query=R.+Jos%C3%A9+Luiz+Rezende,+195,+Sarzedo+-+MG" target="_blank" rel="noopener" style="color:#fff;font-weight:700">Abrir no mapa →</a></p></div>
-    <div><h3>Horário</h3><p>Terça a domingo: 9h às 21h<br>Segunda: fechado</p></div>
+    <div><h3>Horário</h3><p>Terça a quinta: 10h às 23h<br>Sexta a domingo: 10h à meia-noite<br>Segunda: fechado</p></div>
     <div><h3>Fale com a gente</h3><p>WhatsApp e telefone: (31) 97199-4269<br>Delivery de quarta a domingo</p></div>
   </div>
   <div class="wrap gut legal">Beba com moderação. Venda proibida para menores de 18 anos. Se beber, não dirija. Preços sujeitos a alteração.</div>
@@ -457,13 +457,18 @@ $('copy').onclick = () => {
     .catch(() => { $('copy-msg').textContent = txt; });
 };
 
-// aberto/fechado agora (horário de Sarzedo): ter-dom 9h-21h, segunda fechado
+// aberto/fechado agora (horário de Sarzedo): ter-qui 10h-23h, sex-dom 10h-0h, segunda fechado
 (function(){
   try{
     const parts = new Intl.DateTimeFormat('en-US',{timeZone:'America/Sao_Paulo',weekday:'short',hour:'numeric',hour12:false}).formatToParts(new Date());
     const wd = parts.find(p => p.type==='weekday').value, h = +parts.find(p => p.type==='hour').value % 24;
-    const open = wd !== 'Mon' && h >= 9 && h < 21;
-    $('status').innerHTML = open ? '<b style="background:#fff;color:#A30008;padding:2px 8px;border-radius:999px">Aberto agora</b> até 21h' : '<b style="background:#161212;color:#fff;padding:2px 8px;border-radius:999px">Fechado agora</b> ' + (wd==='Sun' && h>=21 ? 'abre terça às 9h' : wd==='Mon' ? 'abre terça às 9h' : 'abre às 9h');
+    const late = ['Fri','Sat','Sun'].includes(wd), close = late ? 24 : 23;
+    const open = wd !== 'Mon' && h >= 10 && h < close;
+    const pill = (t,bg,fg) => `<b style="background:${bg};color:${fg};padding:2px 8px;border-radius:999px">${t}</b> `;
+    let next = 'abre às 10h';
+    if (wd === 'Mon' || (wd === 'Sun' && h >= close)) next = 'abre terça às 10h';
+    else if (h >= close) next = 'abre amanhã às 10h';
+    $('status').innerHTML = open ? pill('Aberto agora','#fff','#A30008') + 'até ' + (late ? 'meia-noite' : '23h') : pill('Fechado agora','#161212','#fff') + next;
   }catch(e){}
 })();
 
